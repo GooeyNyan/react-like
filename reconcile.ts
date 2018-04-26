@@ -212,29 +212,37 @@ function updateDomProperties(
   addNextAttributes(nextProps, dom);
 }
 
-const removePrevListeners = (prevProps: object, dom: HTMLElement | Text) =>
-  Object.keys(prevProps)
+const handleListener = (
+  props: object,
+  dom: HTMLElement | Text,
+  isRemoveListener: boolean
+) =>
+  Object.keys(props)
     .filter(isListener)
     .forEach((listener: string) => {
       const eventType = listener.toLocaleLowerCase().substring(2);
-      (<HTMLElement>dom).removeEventListener(eventType, prevProps[listener]);
+      isRemoveListener
+        ? (<HTMLElement>dom).removeEventListener(eventType, props[listener])
+        : (<HTMLElement>dom).addEventListener(eventType, props[listener]);
     });
+
+const handleAttributes = (
+  props: object,
+  dom: HTMLElement | Text,
+  isRemoveAttr: boolean
+) =>
+  Object.keys(props)
+    .filter(isAttribute)
+    .forEach((attr: string) => (dom[attr] = isRemoveAttr ? null : props[attr]));
+
+const removePrevListeners = (prevProps: object, dom: HTMLElement | Text) =>
+  handleListener(prevProps, dom, true);
 
 const removePrevAttributes = (prevProps: object, dom: HTMLElement | Text) =>
-  Object.keys(prevProps)
-    .filter(isAttribute)
-    .forEach((attr: string) => (dom[attr] = null));
+  handleAttributes(prevProps, dom, true);
 
-const addNextListeners = (nextProps: object, dom: HTMLElement | Text) => {
-  Object.keys(nextProps)
-    .filter(isListener)
-    .forEach((listener: string) => {
-      const eventType = listener.toLocaleLowerCase().substring(2);
-      (<HTMLElement>dom).addEventListener(eventType, nextProps[listener]);
-    });
-};
+const addNextListeners = (nextProps: object, dom: HTMLElement | Text) =>
+  handleListener(nextProps, dom, false);
 
 const addNextAttributes = (nextProps: object, dom: HTMLElement | Text) =>
-  Object.keys(nextProps)
-    .filter(isAttribute)
-    .forEach((attr: string) => (dom[attr] = nextProps[attr]));
+  handleAttributes(nextProps, dom, true);
