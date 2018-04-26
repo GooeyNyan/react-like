@@ -1,0 +1,2 @@
+export const NEXT_SUCCESSOR = `NEXT_SUCCESSOR`;
+export const TEXT_ELEMENT = `TEXT_ELEMENT`;
